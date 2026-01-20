@@ -1,6 +1,6 @@
 import type { Contact } from '../types/contact';
 
-const SHEET_ID = '1FIQZP9Www61affUlC1UjBhMJSoW7gT1w73np_GkSOos';
+const SHEET_ID = '1fuDqUbPJwfHBbMHgGv_U9o7zGx-6YbFREI1RXK0jbWM';
 const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv`;
 
 function parseCSV(text: string): string[][] {
