@@ -1,6 +1,6 @@
 import type { Contact } from '../types/contact';
 
-const SHEET_ID = '1eoJ3UDViZg-JJgd8XMhX-yeKz3E4qQqBlXQLXQAdeO0';
+const SHEET_ID = '1FIQZP9Www61affUlC1UjBhMJSoW7gT1w73np_GkSOos';
 const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv`;
 
 function parseCSV(text: string): string[][] {
@@ -53,52 +53,39 @@ function parseBoolean(value: string): boolean {
   return lower === 'yes' || lower === 'true' || lower === '1';
 }
 
-function parseNumber(value: string): number {
-  const num = parseInt(value, 10);
-  return isNaN(num) ? 0 : num;
-}
-
-export function parseSheetRow(row: string[], headers: string[]): Contact {
+export function parseSheetRow(row: string[], headers: string[], index: number): Contact {
   const getValue = (columnName: string): string => {
-    const index = headers.indexOf(columnName);
-    return index >= 0 ? (row[index] || '').trim() : '';
+    const idx = headers.findIndex(h => h.toLowerCase().trim() === columnName.toLowerCase().trim());
+    return idx >= 0 ? (row[idx] || '').trim() : '';
   };
 
-  const labels = getValue('Labels')
-    .split(',')
-    .map((l) => l.trim())
-    .filter(Boolean);
-
-  const members = getValue('Members')
-    .split(',')
-    .map((m) => m.trim())
-    .filter(Boolean);
+  const companyName = getValue('Card Name');
 
   return {
-    id: getValue('Card ID') || crypto.randomUUID(),
-    companyName: getValue('Card Name'),
-    cardUrl: getValue('Card URL') || undefined,
-    description: getValue('Card Description'),
-    labels,
-    members,
+    id: `contact-${index}`,
+    companyName,
+    cardUrl: undefined,
+    description: '',
+    labels: [],
+    members: [],
 
-    listId: getValue('List ID'),
-    listName: getValue('List Name') || 'Leads',
-    boardId: getValue('Board ID'),
-    boardName: getValue('Board Name'),
-    archived: parseBoolean(getValue('Archived')),
+    listId: '',
+    listName: 'Contacts',
+    boardId: '',
+    boardName: '',
+    archived: false,
 
     linkedIn: getValue('LinkedIn'),
     twitter: getValue('Twitter'),
     website: getValue('Website'),
 
-    followingTapLinkedIn: parseBoolean(getValue('Following from TAP LinkedIn?')),
-    connectedWithKip: parseBoolean(getValue('Connected with Kip on Linkedin?')),
-    connectedWithGertie: parseBoolean(getValue('Connected with Gertie on Linkedin?')),
-    followsTapPage: parseBoolean(getValue('Follows TAP Page?')),
+    followingTapLinkedIn: false,
+    connectedWithKip: false,
+    connectedWithGertie: false,
+    followsTapPage: false,
 
-    email: getValue('Email Address'),
-    phone: getValue('Phone #'),
+    email: '',
+    phone: '',
 
     fullAddress: getValue('Full Add'),
     streetAddress: getValue('Street Address'),
@@ -116,16 +103,16 @@ export function parseSheetRow(row: string[], headers: string[]): Contact {
     isCompany: parseBoolean(getValue('Company?')),
     notes: getValue('NOTES'),
 
-    dueDate: getValue('Due Date'),
-    startDate: getValue('Start Date'),
-    lastActivityDate: getValue('Last Activity Date'),
+    dueDate: '',
+    startDate: '',
+    lastActivityDate: '',
 
-    attachmentCount: parseNumber(getValue('Attachment Count')),
-    attachmentLinks: getValue('Attachment Links'),
-    checklistTotal: parseNumber(getValue('Checklist Item Total Count')),
-    checklistCompleted: parseNumber(getValue('Checklist Item Completed Count')),
-    voteCount: parseNumber(getValue('Vote Count')),
-    commentCount: parseNumber(getValue('Comment Count')),
+    attachmentCount: 0,
+    attachmentLinks: '',
+    checklistTotal: 0,
+    checklistCompleted: 0,
+    voteCount: 0,
+    commentCount: 0,
   };
 }
 
@@ -146,6 +133,11 @@ export async function fetchContacts(): Promise<Contact[]> {
   const dataRows = rows.slice(1);
 
   return dataRows
-    .filter((row) => row.some((cell) => cell.trim()))
-    .map((row) => parseSheetRow(row, headers));
+    .filter((row) => {
+      // Filter out empty rows and rows without a company name
+      const cardNameIdx = headers.findIndex(h => h.toLowerCase().trim() === 'card name');
+      const cardName = cardNameIdx >= 0 ? (row[cardNameIdx] || '').trim() : '';
+      return cardName.length > 0;
+    })
+    .map((row, index) => parseSheetRow(row, headers, index));
 }

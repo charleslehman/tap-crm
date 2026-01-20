@@ -6,15 +6,6 @@ interface ContactCardProps {
   onClick: () => void;
 }
 
-const listColors: Record<string, string> = {
-  Leads: 'bg-yellow-100 text-yellow-800',
-  'Social Outreach': 'bg-blue-100 text-blue-800',
-  'Welcome Package': 'bg-purple-100 text-purple-800',
-  'Active Client': 'bg-green-100 text-green-800',
-  Inactive: 'bg-gray-100 text-gray-800',
-  'Not Interested': 'bg-red-100 text-red-800',
-};
-
 function hasLinkedIn(contact: Contact): boolean {
   return Boolean(contact.linkedIn && contact.linkedIn.toLowerCase() !== 'no');
 }
@@ -25,8 +16,6 @@ export function ContactCard({ contact, viewMode, onClick }: ContactCardProps) {
     window.open(url, '_blank', 'noopener,noreferrer');
   };
 
-  const listColor = listColors[contact.listName] || 'bg-gray-100 text-gray-800';
-
   if (viewMode === 'list') {
     return (
       <div
@@ -34,28 +23,12 @@ export function ContactCard({ contact, viewMode, onClick }: ContactCardProps) {
         className="flex items-center gap-4 p-4 bg-white border border-gray-200 rounded-lg hover:shadow-md transition-shadow cursor-pointer"
       >
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2">
-            <h3 className="font-semibold text-gray-900 truncate">
-              {contact.companyName}
-            </h3>
-            <span className={`px-2 py-0.5 text-xs rounded-full ${listColor}`}>
-              {contact.listName}
-            </span>
-          </div>
+          <h3 className="font-semibold text-gray-900 truncate">
+            {contact.companyName}
+          </h3>
           <p className="text-sm text-gray-500 truncate">
-            {contact.description || contact.city ? `${contact.city}${contact.city && contact.state ? ', ' : ''}${contact.state}` : 'No description'}
+            {contact.city ? `${contact.city}${contact.state ? `, ${contact.state}` : ''}` : contact.state || ''}
           </p>
-        </div>
-
-        <div className="flex items-center gap-2">
-          {contact.labels.slice(0, 2).map((label) => (
-            <span
-              key={label}
-              className="px-2 py-0.5 text-xs bg-gray-100 text-gray-600 rounded"
-            >
-              {label}
-            </span>
-          ))}
         </div>
 
         <div className="flex items-center gap-2">
@@ -102,35 +75,19 @@ export function ContactCard({ contact, viewMode, onClick }: ContactCardProps) {
       onClick={onClick}
       className="p-4 bg-white border border-gray-200 rounded-lg hover:shadow-md transition-shadow cursor-pointer"
     >
-      <div className="flex items-start justify-between mb-2">
-        <h3 className="font-semibold text-gray-900 truncate flex-1 mr-2">
-          {contact.companyName}
-        </h3>
-        <span className={`px-2 py-0.5 text-xs rounded-full whitespace-nowrap ${listColor}`}>
-          {contact.listName}
-        </span>
-      </div>
+      <h3 className="font-semibold text-gray-900 truncate mb-2">
+        {contact.companyName}
+      </h3>
 
-      <p className="text-sm text-gray-500 mb-3 line-clamp-2">
-        {contact.description || (contact.city ? `${contact.city}${contact.state ? `, ${contact.state}` : ''}` : 'No description')}
+      <p className="text-sm text-gray-500 mb-3">
+        {contact.city ? `${contact.city}${contact.state ? `, ${contact.state}` : ''}` : contact.state || 'No location'}
       </p>
-
-      <div className="flex flex-wrap gap-1 mb-3">
-        {contact.labels.slice(0, 3).map((label) => (
-          <span
-            key={label}
-            className="px-2 py-0.5 text-xs bg-gray-100 text-gray-600 rounded"
-          >
-            {label}
-          </span>
-        ))}
-      </div>
 
       <div className="flex items-center justify-between pt-3 border-t border-gray-100">
         <div className="flex items-center gap-1 text-xs text-gray-400">
-          {contact.city && <span>{contact.city}</span>}
-          {contact.city && contact.state && <span>,</span>}
-          {contact.state && <span>{contact.state}</span>}
+          {contact.tarsecList && (
+            <span className="px-2 py-0.5 bg-orange-100 text-orange-700 rounded">TARSEC</span>
+          )}
         </div>
         <div className="flex items-center gap-1">
           {hasLinkedIn(contact) && (

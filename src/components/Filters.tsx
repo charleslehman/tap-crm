@@ -36,30 +36,11 @@ export function Filters({
     return 'bg-gray-100 text-gray-600 border-gray-300';
   };
 
-  // Get unique list names from contacts
-  const listNames = ['All', ...new Set(contacts.map((c) => c.listName).filter(Boolean))];
-
   // Get unique states from contacts
   const states = ['All', ...new Set(contacts.map((c) => c.state).filter(Boolean))].sort();
 
   return (
     <div className="flex flex-wrap items-center gap-4 mb-6 p-4 bg-gray-50 rounded-lg">
-      {/* List/Stage Dropdown */}
-      <div className="flex items-center gap-2">
-        <label className="text-sm font-medium text-gray-700">List:</label>
-        <select
-          value={filters.listName}
-          onChange={(e) => updateFilter('listName', e.target.value)}
-          className="px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-        >
-          {listNames.map((name) => (
-            <option key={name} value={name}>
-              {name}
-            </option>
-          ))}
-        </select>
-      </div>
-
       {/* State Dropdown */}
       <div className="flex items-center gap-2">
         <label className="text-sm font-medium text-gray-700">State:</label>
