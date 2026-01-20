@@ -5,18 +5,30 @@ interface StatsCardsProps {
 }
 
 export function StatsCards({ contacts }: StatsCardsProps) {
-  const totalContacts = contacts.length;
-  const withLinkedIn = contacts.filter((c) => c.linkedIn && c.linkedIn.toLowerCase() !== 'no').length;
-  const withWebsite = contacts.filter((c) => c.website).length;
-  const withTwitter = contacts.filter((c) => c.twitter).length;
-  const inTexas = contacts.filter((c) => c.state === 'TX' || c.state === 'Texas').length;
+  const totalCompanies = contacts.length;
+
+  // Count unique house districts
+  const houseDistricts = new Set(
+    contacts.flatMap((c) => c.txHouseDistrict.split(',').map(d => d.trim()).filter(Boolean))
+  );
+
+  // Count unique senate districts
+  const senateDistricts = new Set(
+    contacts.flatMap((c) => c.txSenateDistrict.split(',').map(d => d.trim()).filter(Boolean))
+  );
+
+  // Count unique cities
+  const cities = new Set(contacts.map((c) => c.city).filter(Boolean));
+
+  // Count TARSEC list companies
+  const tarsecCount = contacts.filter((c) => c.tarsecList).length;
 
   const stats = [
-    { label: 'Total Contacts', value: totalContacts, color: 'bg-blue-500' },
-    { label: 'LinkedIn', value: withLinkedIn, color: 'bg-sky-500' },
-    { label: 'Website', value: withWebsite, color: 'bg-purple-500' },
-    { label: 'Twitter', value: withTwitter, color: 'bg-cyan-500' },
-    { label: 'In Texas', value: inTexas, color: 'bg-orange-500' },
+    { label: 'Companies', value: totalCompanies, color: 'bg-blue-500' },
+    { label: 'House Districts', value: houseDistricts.size, color: 'bg-indigo-500' },
+    { label: 'Senate Districts', value: senateDistricts.size, color: 'bg-purple-500' },
+    { label: 'Cities', value: cities.size, color: 'bg-green-500' },
+    { label: 'TARSEC List', value: tarsecCount, color: 'bg-orange-500' },
   ];
 
   return (

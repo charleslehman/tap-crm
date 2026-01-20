@@ -15,16 +15,10 @@ interface DashboardProps {
 
 const initialFilters: FilterState = {
   search: '',
-  listName: 'All',
-  hasLinkedIn: null,
-  hasWebsite: null,
-  hasTwitter: null,
-  state: 'All',
+  houseDistrict: 'All',
+  senateDistrict: 'All',
+  city: 'All',
 };
-
-function hasLinkedIn(contact: Contact): boolean {
-  return Boolean(contact.linkedIn && contact.linkedIn.toLowerCase() !== 'no');
-}
 
 export function Dashboard({ contacts, loading, error, onRefresh }: DashboardProps) {
   const [filters, setFilters] = useState<FilterState>(initialFilters);
@@ -38,37 +32,29 @@ export function Dashboard({ contacts, loading, error, onRefresh }: DashboardProp
         const searchLower = filters.search.toLowerCase();
         const matchesSearch =
           contact.companyName.toLowerCase().includes(searchLower) ||
-          contact.description.toLowerCase().includes(searchLower) ||
-          contact.labels.some((label) =>
-            label.toLowerCase().includes(searchLower)
-          ) ||
           contact.city.toLowerCase().includes(searchLower) ||
-          contact.notes.toLowerCase().includes(searchLower);
+          contact.houseRepName.toLowerCase().includes(searchLower) ||
+          contact.senateRepName.toLowerCase().includes(searchLower) ||
+          contact.txHouseDistrict.includes(searchLower) ||
+          contact.txSenateDistrict.includes(searchLower);
         if (!matchesSearch) return false;
       }
 
-      // List/Stage filter
-      if (filters.listName !== 'All' && contact.listName !== filters.listName) {
-        return false;
+      // House District filter
+      if (filters.houseDistrict !== 'All') {
+        const districts = contact.txHouseDistrict.split(',').map(d => d.trim());
+        if (!districts.includes(filters.houseDistrict)) return false;
       }
 
-      // State filter
-      if (filters.state !== 'All' && contact.state !== filters.state) {
-        return false;
+      // Senate District filter
+      if (filters.senateDistrict !== 'All') {
+        const districts = contact.txSenateDistrict.split(',').map(d => d.trim());
+        if (!districts.includes(filters.senateDistrict)) return false;
       }
 
-      // Platform filters
-      if (filters.hasLinkedIn !== null) {
-        const contactHasLinkedIn = hasLinkedIn(contact);
-        if (contactHasLinkedIn !== filters.hasLinkedIn) return false;
-      }
-      if (filters.hasWebsite !== null) {
-        const contactHasWebsite = Boolean(contact.website);
-        if (contactHasWebsite !== filters.hasWebsite) return false;
-      }
-      if (filters.hasTwitter !== null) {
-        const contactHasTwitter = Boolean(contact.twitter);
-        if (contactHasTwitter !== filters.hasTwitter) return false;
+      // City filter
+      if (filters.city !== 'All' && contact.city !== filters.city) {
+        return false;
       }
 
       return true;
@@ -80,7 +66,7 @@ export function Dashboard({ contacts, loading, error, onRefresh }: DashboardProp
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading contacts...</p>
+          <p className="text-gray-600">Loading companies...</p>
         </div>
       </div>
     );
@@ -109,7 +95,10 @@ export function Dashboard({ contacts, loading, error, onRefresh }: DashboardProp
       {/* Header */}
       <header className="bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-gray-900">TAP CRM</h1>
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Texas Space District Lookup</h1>
+            <p className="text-sm text-gray-500">Find companies by legislative district</p>
+          </div>
           {onRefresh && (
             <button
               onClick={onRefresh}
@@ -148,13 +137,13 @@ export function Dashboard({ contacts, loading, error, onRefresh }: DashboardProp
 
         {/* Results Count */}
         <div className="mb-4 text-sm text-gray-500">
-          Showing {filteredContacts.length} of {contacts.length} contacts
+          Showing {filteredContacts.length} of {contacts.length} companies
         </div>
 
         {/* Contact Grid/List */}
         {filteredContacts.length === 0 ? (
           <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
-            <p className="text-gray-500">No contacts match your filters</p>
+            <p className="text-gray-500">No companies match your filters</p>
           </div>
         ) : viewMode === 'grid' ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

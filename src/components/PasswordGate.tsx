@@ -37,7 +37,7 @@ export function PasswordGate({ children }: PasswordGateProps) {
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
       <div className="bg-white rounded-lg shadow-lg p-8 max-w-md w-full">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2 text-center">TAP CRM</h1>
+        <h1 className="text-2xl font-bold text-gray-900 mb-2 text-center">Texas Space District Lookup</h1>
         <p className="text-gray-500 text-center mb-6">Enter password to continue</p>
 
         <form onSubmit={handleSubmit}>

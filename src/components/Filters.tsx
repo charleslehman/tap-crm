@@ -22,62 +22,73 @@ export function Filters({
     onFilterChange({ ...filters, [key]: value });
   };
 
-  const togglePlatform = (
-    key: 'hasLinkedIn' | 'hasWebsite' | 'hasTwitter'
-  ) => {
-    const current = filters[key];
-    const next = current === null ? true : current === true ? false : null;
-    updateFilter(key, next);
-  };
+  // Get unique house districts
+  const houseDistricts = ['All', ...new Set(
+    contacts
+      .flatMap((c) => c.txHouseDistrict.split(',').map(d => d.trim()))
+      .filter(Boolean)
+      .sort((a, b) => parseInt(a) - parseInt(b))
+  )];
 
-  const getPlatformButtonClass = (value: boolean | null) => {
-    if (value === true) return 'bg-green-100 text-green-700 border-green-300';
-    if (value === false) return 'bg-red-100 text-red-700 border-red-300';
-    return 'bg-gray-100 text-gray-600 border-gray-300';
-  };
+  // Get unique senate districts
+  const senateDistricts = ['All', ...new Set(
+    contacts
+      .flatMap((c) => c.txSenateDistrict.split(',').map(d => d.trim()))
+      .filter(Boolean)
+      .sort((a, b) => parseInt(a) - parseInt(b))
+  )];
 
-  // Get unique states from contacts
-  const states = ['All', ...new Set(contacts.map((c) => c.state).filter(Boolean))].sort();
+  // Get unique cities
+  const cities = ['All', ...new Set(contacts.map((c) => c.city).filter(Boolean))].sort();
 
   return (
     <div className="flex flex-wrap items-center gap-4 mb-6 p-4 bg-gray-50 rounded-lg">
-      {/* State Dropdown */}
+      {/* House District Dropdown */}
       <div className="flex items-center gap-2">
-        <label className="text-sm font-medium text-gray-700">State:</label>
+        <label className="text-sm font-medium text-gray-700">House District:</label>
         <select
-          value={filters.state}
-          onChange={(e) => updateFilter('state', e.target.value)}
+          value={filters.houseDistrict || 'All'}
+          onChange={(e) => updateFilter('houseDistrict', e.target.value)}
           className="px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
         >
-          {states.map((state) => (
-            <option key={state} value={state}>
-              {state}
+          {houseDistricts.map((district) => (
+            <option key={district} value={district}>
+              {district === 'All' ? 'All Districts' : `District ${district}`}
             </option>
           ))}
         </select>
       </div>
 
-      {/* Platform Toggles */}
+      {/* Senate District Dropdown */}
       <div className="flex items-center gap-2">
-        <span className="text-sm font-medium text-gray-700">Platform:</span>
-        <button
-          onClick={() => togglePlatform('hasLinkedIn')}
-          className={`px-3 py-1.5 text-sm border rounded-md transition-colors ${getPlatformButtonClass(filters.hasLinkedIn)}`}
+        <label className="text-sm font-medium text-gray-700">Senate District:</label>
+        <select
+          value={filters.senateDistrict || 'All'}
+          onChange={(e) => updateFilter('senateDistrict', e.target.value)}
+          className="px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
         >
-          LinkedIn {filters.hasLinkedIn === true ? '✓' : filters.hasLinkedIn === false ? '✗' : ''}
-        </button>
-        <button
-          onClick={() => togglePlatform('hasWebsite')}
-          className={`px-3 py-1.5 text-sm border rounded-md transition-colors ${getPlatformButtonClass(filters.hasWebsite)}`}
+          {senateDistricts.map((district) => (
+            <option key={district} value={district}>
+              {district === 'All' ? 'All Districts' : `District ${district}`}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* City Dropdown */}
+      <div className="flex items-center gap-2">
+        <label className="text-sm font-medium text-gray-700">City:</label>
+        <select
+          value={filters.city || 'All'}
+          onChange={(e) => updateFilter('city', e.target.value)}
+          className="px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
         >
-          Website {filters.hasWebsite === true ? '✓' : filters.hasWebsite === false ? '✗' : ''}
-        </button>
-        <button
-          onClick={() => togglePlatform('hasTwitter')}
-          className={`px-3 py-1.5 text-sm border rounded-md transition-colors ${getPlatformButtonClass(filters.hasTwitter)}`}
-        >
-          Twitter {filters.hasTwitter === true ? '✓' : filters.hasTwitter === false ? '✗' : ''}
-        </button>
+          {cities.map((city) => (
+            <option key={city} value={city}>
+              {city}
+            </option>
+          ))}
+        </select>
       </div>
 
       {/* View Mode Toggle */}
